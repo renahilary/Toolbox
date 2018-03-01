@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<p>惰性加载函数</p>
+<div id="demo">Click me</div>
+	
+	
+</div>
+<script type="text/javascript">
+var addEvent_1 = function( elem, type, handler){
+	if(window.addEventListener){
+		return elem.addEventListener(type, handler ,false);
+	}
+	if(window.attchEvent){
+		return elem.attchEvent('on'+type,handler);
+	}
+};//每次调用都执行if条件分支
+
+
+var addEvent_2 = (function(){
+	if(window.addEventListener){
+		return function( elem, type, handler){
+			elem.addEventListener(type, handler, false);
+		}
+	}
+	if(window.attchEvent){
+		return function( elem, type, handler){
+			elem.attchEvent('on'+type, handler);
+		}
+	}
+})();//函数加载时就进行if条件判断，但是如果没有使用过addEvent，前一次的浏览器嗅探就是完全多余的操作
+
+var addEvent = function( elem, type, handler){
+	if(window.addEventListener){
+		addEvent = function(elem, type, handler){
+			elem.addEventListener(type, handler, false);
+		}
+	}else if(window.attchEvent){
+		addEvent = function(elem, type, handler){
+			elem.attchEvent('on'+type, handler);
+		}
+	}
+
+	addEvent( elem, type, handler);
+}; //第一次进入条件分之后，addEvent进行了重写，重写后的函数是我们期望的，下一次进入函数就没有条件分支了
+
+
+///////test 
+///
+
+var div = document.getElementById("demo");
+addEvent(div,'click',function(){ 
+	alert('click');
+});
+addEvent(div,'mouseover',function(){ 
+	div.innerHTML = "over";
+});
+addEvent(div,'mouseout',function(){ 
+	div.innerHTML = "Click me";
+});
+</script>
+</body>
+</html>
